@@ -61,9 +61,9 @@ export const HygienePage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 pb-24 md:pb-12">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-pink-900 via-rose-950 to-slate-950 text-white rounded-3xl p-6 sm:p-10 border border-pink-800/40 shadow-2xl space-y-4">
+      <div className="bg-gradient-to-r from-pink-900 via-rose-950 to-slate-950 text-white rounded-3xl p-4 sm:p-7 border border-pink-800/40 shadow-sm space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 text-xs font-bold border border-pink-400/30">
           <Sparkles className="w-3.5 h-3.5 text-pink-400" />
           <span>Menstrual Dignity & Rotary WASH Network</span>

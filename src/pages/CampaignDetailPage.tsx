@@ -58,7 +58,7 @@ export const CampaignDetailPage: React.FC = () => {
 
   const percent = Math.min(100, Math.round((campaign.raisedAmount / campaign.targetAmount) * 100));
   const remaining = Math.max(0, campaign.targetAmount - campaign.raisedAmount);
-  const isPartnerOrAdmin = currentRole === 'funding_partner' || currentRole === 'admin';
+  const isPartnerOrAdmin = true; // Open to donors, Rotary members, and municipal governors
 
   const handleExpenseSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +85,7 @@ export const CampaignDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-3 sm:px-6 py-4 space-y-5 pb-24">
       {/* Top Breadcrumb */}
       <div className="flex items-center justify-between">
         <button

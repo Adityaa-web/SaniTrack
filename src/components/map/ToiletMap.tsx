@@ -199,8 +199,8 @@ export const ToiletMap: React.FC<ToiletMapProps> = ({
   return (
     <div
       ref={mapContainerRef}
-      style={{ height, minHeight: '350px' }}
-      className="w-full rounded-2xl overflow-hidden shadow-sm border border-slate-200 relative z-10"
+      style={{ height }}
+      className="w-full h-full relative z-10"
     />
   );
 };

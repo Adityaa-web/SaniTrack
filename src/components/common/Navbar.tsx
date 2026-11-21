@@ -1,98 +1,95 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import {
   Compass,
-  Moon,
   Sparkles,
   AlertOctagon,
   HeartHandshake,
   PhoneCall,
-  LayoutDashboard,
-  ShieldCheck,
+  FileText,
   Share2,
   X,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { currentRole, currentUser } = useAuth();
   const location = useLocation();
   const [emergencyModalOpen, setEmergencyModalOpen] = useState(false);
-
-  const getDashboardPath = () => {
-    switch (currentRole) {
-      case 'operator':
-      case 'worker':
-        return '/dashboard/operator';
-      case 'municipal_officer':
-        return '/dashboard/municipal';
-      case 'funding_partner':
-        return '/dashboard/rotary';
-      case 'admin':
-        return '/dashboard/admin';
-      case 'citizen':
-      default:
-        return '/dashboard/citizen';
-    }
-  };
-
-  const navLinks = [
-    { to: '/', label: 'Toilets Map', icon: Compass },
-    { to: '/night-mode', label: 'Night Safe', icon: Moon },
-    { to: '/hygiene', label: 'Pads & Hygiene', icon: Sparkles },
-    { to: '/campaigns', label: 'Rotary Projects', icon: HeartHandshake },
-    { to: '/report', label: 'Report Grievance', icon: AlertOctagon },
-  ];
 
   return (
     <>
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
-          {/* Logo & Civic Tag */}
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
-              <span className="font-extrabold text-lg tracking-tighter">ST</span>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-13 flex items-center justify-between gap-3">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
+              <span className="font-extrabold text-base tracking-tighter">ST</span>
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-lg tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
-                  SaniTrack
-                </span>
-                <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.2 rounded uppercase">
-                  Pune
-                </span>
-              </div>
-              <p className="text-[10px] text-slate-500 font-medium -mt-0.5 hidden sm:block">
-                Smart Public Sanitation Network
-              </p>
+            <div className="flex items-center gap-1.5">
+              <span className="font-black text-lg tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
+                SaniTrack
+              </span>
+              <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.2 rounded uppercase">
+                Pune
+              </span>
             </div>
           </Link>
 
-          {/* Desktop Nav Items (Hidden on Mobile, handled by BottomNav) */}
+          {/* Desktop Nav Items */}
           <nav className="hidden md:flex items-center gap-1 text-xs font-semibold">
-            {navLinks.map((item) => {
-              const Icon = item.icon;
-              const active = location.pathname === item.to;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={`px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all ${
-                    active
-                      ? 'bg-emerald-50 text-emerald-800 font-bold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+            <Link
+              to="/"
+              className={`px-3 py-1.5 rounded-xl transition-all ${
+                location.pathname === '/' || location.pathname === '/find'
+                  ? 'bg-emerald-50 text-emerald-800 font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              Toilets Map
+            </Link>
+            <Link
+              to="/reports"
+              className={`px-3 py-1.5 rounded-xl transition-all ${
+                location.pathname === '/reports'
+                  ? 'bg-emerald-50 text-emerald-800 font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              Public Reports
+            </Link>
+            <Link
+              to="/hygiene"
+              className={`px-3 py-1.5 rounded-xl transition-all ${
+                location.pathname === '/hygiene'
+                  ? 'bg-emerald-50 text-emerald-800 font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              Pads & Hygiene
+            </Link>
+            <Link
+              to="/night-mode"
+              className={`px-3 py-1.5 rounded-xl transition-all ${
+                location.pathname === '/night-mode'
+                  ? 'bg-emerald-50 text-emerald-800 font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              Night Safe
+            </Link>
+            <Link
+              to="/campaigns"
+              className={`px-3 py-1.5 rounded-xl transition-all ${
+                location.pathname === '/campaigns'
+                  ? 'bg-emerald-50 text-emerald-800 font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+            >
+              Community Fund
+            </Link>
           </nav>
 
-          {/* Right Header Actions */}
+          {/* Right Header: SOS Button */}
           <div className="flex items-center gap-2">
-            {/* SOS Help Button */}
             <button
               onClick={() => setEmergencyModalOpen(true)}
               className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 flex items-center gap-1.5 transition-colors shrink-0"
@@ -101,15 +98,6 @@ export const Navbar: React.FC = () => {
               <PhoneCall className="w-3.5 h-3.5 text-rose-600" />
               <span>SOS Help</span>
             </button>
-
-            {/* Active Persona Badge & Link */}
-            <Link
-              to={getDashboardPath()}
-              className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all shrink-0"
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              <span className="capitalize">{currentRole.replace('_', ' ')}</span>
-            </Link>
           </div>
         </div>
       </header>

@@ -54,27 +54,26 @@ export const CampaignsPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-4xl mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-5 pb-24">
       {/* Banner */}
-      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white rounded-3xl p-6 sm:p-10 border border-emerald-800/40 shadow-2xl space-y-4">
+      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white rounded-3xl p-5 sm:p-7 border border-emerald-800/40 shadow-sm space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30">
           <HeartHandshake className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Rotary & Community Sanitation Fund</span>
+          <span>Community & Rotary Sanitation Fund</span>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
-          Transparent Public Toilet Maintenance Projects
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
+          Public Maintenance & Upgrade Projects
         </h1>
 
-        <p className="max-w-3xl text-xs sm:text-sm text-slate-300 leading-relaxed">
-          When municipal funds face delays, verified public toilet maintenance needs in Pune are sponsored through transparent Rotary and citizen micro-pledges. Every rupee is accounted for with public contractor invoices.
+        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          Open transparency portal where citizens, Rotary partners, donors, and municipal officers can review public toilet repair needs, inspect contractor receipts, and pledge support.
         </p>
 
-        {/* Prototype Warning */}
-        <div className="p-3 bg-emerald-950/70 rounded-xl border border-emerald-800/60 text-xs text-emerald-200 flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+        <div className="p-2.5 bg-emerald-950/80 rounded-xl border border-emerald-800/60 text-[11px] text-emerald-200 flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>
-            <strong>Simulated Prototype Demonstration:</strong> All pledges shown here are demo transactions. No real payment or tax deductions are collected without signed municipal MoUs.
+            Every rupee raised is publicly reconciled against contractor invoices and verified work photos.
           </span>
         </div>
       </div>

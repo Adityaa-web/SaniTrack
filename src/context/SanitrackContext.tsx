@@ -54,7 +54,8 @@ interface SanitrackContextType {
     category: string;
     description: string;
     priority: PriorityLevel;
-    isAnonymous: boolean;
+    reporterEmail?: string;
+    isAnonymous?: boolean;
     photoDataUrl?: string;
   }) => string; // returns referenceCode
   updateComplaintStatus: (
@@ -310,7 +311,8 @@ export const SanitrackProvider: React.FC<{ children: React.ReactNode }> = ({
     category: string;
     description: string;
     priority: PriorityLevel;
-    isAnonymous: boolean;
+    reporterEmail?: string;
+    isAnonymous?: boolean;
     photoDataUrl?: string;
   }): string => {
     const refCode = generateComplaintRef();
@@ -326,8 +328,11 @@ export const SanitrackProvider: React.FC<{ children: React.ReactNode }> = ({
       description: data.description,
       priority: data.priority,
       status: 'submitted',
-      reporterName: data.isAnonymous ? 'Anonymous Citizen' : currentUser.fullName,
-      isAnonymous: data.isAnonymous,
+      reporterEmail: data.reporterEmail,
+      reporterName: data.reporterEmail
+        ? data.reporterEmail.split('@')[0]
+        : 'Citizen Contributor',
+      isAnonymous: data.isAnonymous ?? false,
       isPublicSummary: true,
       eligibleForCampaign: data.category.toLowerCase().includes('broken') || data.category.toLowerCase().includes('water'),
       estimatedCost: 0,

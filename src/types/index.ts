@@ -206,6 +206,7 @@ export interface Complaint {
   status: ComplaintStatus;
   reporterId?: string;
   reporterName?: string;
+  reporterEmail?: string;
   isAnonymous: boolean;
   isPublicSummary: boolean;
   assignedToName?: string;

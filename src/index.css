@@ -8,6 +8,9 @@
 
   body {
     font-family: var(--font-sans);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
 }
 
@@ -15,7 +18,6 @@
 .leaflet-container {
   width: 100%;
   height: 100%;
-  border-radius: 0.75rem;
   z-index: 10;
 }
 
@@ -25,13 +27,22 @@
   justify-content: center;
 }
 
+/* Hide scrollbars for fast horizontal filters */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
@@ -41,18 +52,18 @@
   background: #94a3b8;
 }
 
-/* Pulse animation for night mode & live freshness */
-@keyframes soft-pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
+/* Slide up animation for quick sheet */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
-  50% {
-    opacity: 0.85;
-    transform: scale(1.03);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.animate-soft-pulse {
-  animation: soft-pulse 2.5s infinite ease-in-out;
+.animate-slide-up {
+  animation: slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

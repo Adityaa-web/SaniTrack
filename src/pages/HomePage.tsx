@@ -122,24 +122,24 @@ export const HomePage: React.FC = () => {
   const openCount = toilets.filter((t) => t.currentStatus === 'open').length;
 
   return (
-    <div className="relative min-h-[calc(100vh-120px)] flex flex-col bg-slate-100 pb-20">
+    <div className="relative flex-1 flex flex-col w-full h-full overflow-hidden bg-slate-100 pb-14 md:pb-0">
       {/* Top Floating Service Bar */}
-      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-3 sm:px-6 py-2.5 space-y-2 shadow-xs">
+      <div className="bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-2.5 sm:px-6 py-1.5 space-y-1 shadow-xs z-30 shrink-0">
         {/* Search & Location Bar */}
-        <div className="max-w-4xl mx-auto flex items-center gap-2">
+        <div className="max-w-4xl mx-auto flex items-center gap-1.5">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search area (e.g. FC Road, Swargate, Station)..."
-              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+              placeholder="Search area (e.g. FC Road, Swargate)..."
+              className="w-full pl-8 pr-7 py-1.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -149,7 +149,7 @@ export const HomePage: React.FC = () => {
           {/* GPS Locate Me Button */}
           <button
             onClick={handleLocateMe}
-            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1 shrink-0 transition-colors"
             title="Locate me via GPS"
           >
             <Crosshair className="w-4 h-4 text-emerald-600" />
@@ -159,88 +159,88 @@ export const HomePage: React.FC = () => {
           {/* Map vs List Toggle Button */}
           <button
             onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
-            className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all shadow-xs"
+            className="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1 shrink-0 transition-all shadow-xs"
           >
             {viewMode === 'map' ? (
               <>
-                <List className="w-4 h-4" />
-                <span className="hidden sm:inline">List View</span>
+                <List className="w-3.5 h-3.5" />
+                <span className="text-xs">List</span>
               </>
             ) : (
               <>
-                <MapIcon className="w-4 h-4" />
-                <span className="hidden sm:inline">Map View</span>
+                <MapIcon className="w-3.5 h-3.5" />
+                <span className="text-xs">Map</span>
               </>
             )}
           </button>
         </div>
 
         {/* Horizontally Scrollable Fast Filter Pills */}
-        <div className="max-w-4xl mx-auto flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs">
+        <div className="max-w-4xl mx-auto flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 text-xs">
           <button
             onClick={() => setFilterOpenOnly(!filterOpenOnly)}
-            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+            className={`px-2.5 py-0.5 rounded-full font-semibold shrink-0 transition-all border text-[11px] ${
               filterOpenOnly
                 ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            🟢 Open Now ({openCount})
+            🟢 Open ({openCount})
           </button>
 
           <button
             onClick={() => setFilterWomenOnly(!filterWomenOnly)}
-            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+            className={`px-2.5 py-0.5 rounded-full font-semibold shrink-0 transition-all border text-[11px] ${
               filterWomenOnly
                 ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            👩 Women’s Section
+            👩 Women
           </button>
 
           <button
             onClick={() => setFilterPadsOnly(!filterPadsOnly)}
-            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+            className={`px-2.5 py-0.5 rounded-full font-semibold shrink-0 transition-all border text-[11px] ${
               filterPadsOnly
                 ? 'bg-pink-600 text-white border-pink-600 shadow-xs'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            ✨ Pads Available
+            ✨ Pads
           </button>
 
           <button
             onClick={() => setFilterAccessibleOnly(!filterAccessibleOnly)}
-            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+            className={`px-2.5 py-0.5 rounded-full font-semibold shrink-0 transition-all border text-[11px] ${
               filterAccessibleOnly
                 ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            ♿ Accessible Ramp
+            ♿ Accessible
           </button>
 
           <button
             onClick={() => setFilterWaterOnly(!filterWaterOnly)}
-            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+            className={`px-2.5 py-0.5 rounded-full font-semibold shrink-0 transition-all border text-[11px] ${
               filterWaterOnly
                 ? 'bg-cyan-600 text-white border-cyan-600 shadow-xs'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            💧 Running Water
+            💧 Water
           </button>
 
           <button
             onClick={() => setFilterFreeOnly(!filterFreeOnly)}
-            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+            className={`px-2.5 py-0.5 rounded-full font-semibold shrink-0 transition-all border text-[11px] ${
               filterFreeOnly
                 ? 'bg-teal-600 text-white border-teal-600 shadow-xs'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            🆓 Free Entry
+            🆓 Free
           </button>
 
           {(filterOpenOnly ||
@@ -258,7 +258,7 @@ export const HomePage: React.FC = () => {
                 setFilterWaterOnly(false);
                 setFilterFreeOnly(false);
               }}
-              className="text-[11px] font-bold text-rose-600 hover:text-rose-700 px-2 shrink-0"
+              className="text-[11px] font-bold text-rose-600 hover:text-rose-700 px-1.5 shrink-0"
             >
               Reset
             </button>
@@ -268,7 +268,7 @@ export const HomePage: React.FC = () => {
 
       {/* Main Service Area: Interactive Map vs List View */}
       {viewMode === 'map' ? (
-        <div className="relative flex-1 w-full h-[calc(100vh-190px)] min-h-[460px]">
+        <div className="relative flex-1 w-full h-full overflow-hidden">
           {/* Direct Interactive Map */}
           <ToiletMap
             toilets={filteredToilets}
@@ -279,32 +279,30 @@ export const HomePage: React.FC = () => {
           />
 
           {/* Quick Counter Overlay Pill */}
-          <div className="absolute top-3 left-3 z-20 bg-slate-900/85 backdrop-blur-md text-white text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-md flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>
-              {filteredToilets.length} Toilets in Pune Pilot
-            </span>
+          <div className="absolute top-2.5 left-2.5 z-20 bg-slate-900/85 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>{filteredToilets.length} Facilities</span>
           </div>
 
           {/* Floating Selected Toilet Bottom Sheet Card */}
           {selectedToilet && (
-            <div className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 sm:w-96 z-30 bg-white rounded-3xl p-4 sm:p-5 shadow-2xl border border-slate-200/90 animate-slide-up space-y-3">
+            <div className="absolute bottom-16 left-2 right-2 sm:left-auto sm:right-3 sm:bottom-4 sm:w-92 z-30 bg-white rounded-3xl p-3.5 sm:p-4 shadow-2xl border border-slate-200 animate-slide-up space-y-2.5">
               {/* Header */}
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="font-mono text-[10px] font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded">
+                    <span className="font-mono text-[9px] font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded">
                       {selectedToilet.facilityCode}
                     </span>
                     <StatusBadge status={selectedToilet.currentStatus} size="sm" />
-                    <span className="text-[10px] font-bold text-slate-600">
+                    <span className="text-[10px] font-bold text-slate-700">
                       {selectedToilet.distanceKm} km away
                     </span>
                   </div>
-                  <h3 className="font-black text-sm sm:text-base text-slate-900 mt-1 leading-snug">
+                  <h3 className="font-black text-sm text-slate-900 mt-1 leading-snug">
                     {selectedToilet.name}
                   </h3>
-                  <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                  <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
                     <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                     <span className="truncate">{selectedToilet.address}</span>
                   </div>
@@ -320,7 +318,7 @@ export const HomePage: React.FC = () => {
                     }`}
                   >
                     <Heart
-                      className={`w-4 h-4 ${
+                      className={`w-3.5 h-3.5 ${
                         isFavorite(selectedToilet.id) ? 'fill-rose-500' : ''
                       }`}
                     />
@@ -329,71 +327,63 @@ export const HomePage: React.FC = () => {
                     onClick={() => setSelectedToilet(null)}
                     className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
 
               {/* Quick Feature Badges */}
-              <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold text-slate-700">
-                <span className="px-2 py-0.5 bg-slate-100 rounded-md">
+              <div className="flex flex-wrap gap-1 text-[9px] font-semibold text-slate-700">
+                <span className="px-1.5 py-0.5 bg-slate-100 rounded">
                   {selectedToilet.entryFee === 0 ? 'FREE' : `₹${selectedToilet.entryFee}`}
                 </span>
-                <span className="px-2 py-0.5 bg-slate-100 rounded-md">
-                  🕒 {selectedToilet.openingHours.is24x7 ? 'Open 24/7' : `${selectedToilet.openingHours.open}-${selectedToilet.openingHours.close}`}
+                <span className="px-1.5 py-0.5 bg-slate-100 rounded">
+                  🕒 {selectedToilet.openingHours.is24x7 ? '24/7' : `${selectedToilet.openingHours.open}-${selectedToilet.openingHours.close}`}
                 </span>
                 {selectedToilet.sanitaryFacilities?.some(
                   (sf) => sf.facilityType === 'pad_dispenser' && sf.availability
                 ) && (
-                  <span className="px-2 py-0.5 bg-pink-50 text-pink-700 rounded-md border border-pink-200">
-                    ✨ Pads Available
+                  <span className="px-1.5 py-0.5 bg-pink-50 text-pink-700 rounded border border-pink-200">
+                    ✨ Pads
                   </span>
                 )}
                 {selectedToilet.facilities.wheelchairRamp && (
-                  <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md border border-blue-200">
+                  <span className="px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded border border-blue-200">
                     ♿ Ramp
                   </span>
                 )}
-                {selectedToilet.facilities.hasRunningWater ? (
-                  <span className="px-2 py-0.5 bg-cyan-50 text-cyan-800 rounded-md">
+                {selectedToilet.facilities.hasRunningWater && (
+                  <span className="px-1.5 py-0.5 bg-cyan-50 text-cyan-800 rounded">
                     💧 Water OK
-                  </span>
-                ) : (
-                  <span className="px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">
-                    No Water
                   </span>
                 )}
               </div>
 
-              <div className="text-[10px] text-slate-400 italic">
-                {selectedToilet.statusFreshness}
-              </div>
-
               {/* Action Buttons */}
-              <div className="grid grid-cols-3 gap-2 pt-1 border-t border-slate-100">
+              <div className="grid grid-cols-3 gap-1.5 pt-1 border-t border-slate-100">
                 <a
                   href={`https://www.google.com/maps/dir/?api=1&destination=${selectedToilet.latitude},${selectedToilet.longitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-2 px-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1 transition-colors shadow-xs"
+                  className="py-1.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-xl flex items-center justify-center gap-1 transition-colors shadow-xs"
                 >
-                  <Navigation className="w-3.5 h-3.5" />
-                  <span>Directions</span>
+                  <Navigation className="w-3 h-3" />
+                  <span>Navigate</span>
                 </a>
 
                 <Link
                   to={`/toilets/${selectedToilet.id}`}
-                  className="py-2 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1 transition-colors"
+                  className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] rounded-xl flex items-center justify-center gap-1 transition-colors"
                 >
                   <span>Details</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
+                  <ChevronRight className="w-3 h-3" />
                 </Link>
 
                 <Link
                   to={`/report?toiletId=${selectedToilet.id}`}
-                  className="py-2 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl flex items-center justify-center gap-1 transition-colors"
+                  className="py-1.5 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-[11px] rounded-xl flex items-center justify-center gap-1 transition-colors"
                 >
-                  <AlertOctagon className="w-3.5 h-3.5" />
+                  <AlertOctagon className="w-3 h-3" />
                   <span>Report</span>
                 </Link>
               </div>
@@ -402,7 +392,7 @@ export const HomePage: React.FC = () => {
         </div>
       ) : (
         /* List Mode View */
-        <div className="max-w-4xl mx-auto w-full px-4 py-4 space-y-3">
+        <div className="flex-1 overflow-y-auto max-w-3xl mx-auto w-full px-3 py-3 space-y-2.5 pb-24">
           <div className="text-xs font-bold text-slate-500 px-1">
             Found {filteredToilets.length} public facilities in Pune Pilot
           </div>
