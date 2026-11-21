@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { SanitrackProvider } from './context/SanitrackContext';
 import { DemoBanner } from './components/common/DemoBanner';
 import { Navbar } from './components/common/Navbar';
+import { BottomNav } from './components/common/BottomNav';
 import { Footer } from './components/common/Footer';
 
 // Pages
@@ -32,14 +33,14 @@ export const App: React.FC = () => {
     <AuthProvider>
       <SanitrackProvider>
         <BrowserRouter>
-          <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-emerald-500 selection:text-white">
+          <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-emerald-500 selection:text-white pb-16 md:pb-14">
             <DemoBanner />
             <Navbar />
             <main className="flex-1">
               <Routes>
-                {/* Public Discovery Routes */}
+                {/* Home directs straight to Map Discovery */}
                 <Route path="/" element={<HomePage />} />
-                <Route path="/find" element={<FindPage />} />
+                <Route path="/find" element={<HomePage />} />
                 <Route path="/toilets/:id" element={<ToiletDetailPage />} />
                 <Route path="/night-mode" element={<NightModePage />} />
                 <Route path="/hygiene" element={<HygienePage />} />
@@ -65,6 +66,8 @@ export const App: React.FC = () => {
               </Routes>
             </main>
             <Footer />
+            {/* Mobile-first bottom navigation bar */}
+            <BottomNav />
           </div>
         </BrowserRouter>
       </SanitrackProvider>

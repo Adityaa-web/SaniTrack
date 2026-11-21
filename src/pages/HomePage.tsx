@@ -1,331 +1,493 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSanitrack } from '../context/SanitrackContext';
-import { ToiletCard } from '../components/toilet/ToiletCard';
+import { ToiletMap } from '../components/map/ToiletMap';
+import { StatusBadge } from '../components/common/StatusBadge';
+import { calculateDistanceKm, formatTimeAgo } from '../lib/utils';
+import { Toilet } from '../types';
 import {
   Search,
-  Compass,
-  Moon,
-  Sparkles,
-  AlertOctagon,
-  HeartHandshake,
-  ShieldCheck,
-  CheckCircle2,
-  Droplets,
-  Accessibility,
-  ArrowRight,
   MapPin,
-  TrendingUp,
-  Award,
+  Navigation,
+  Sparkles,
+  Accessibility,
+  Droplets,
+  Clock,
+  Heart,
+  AlertOctagon,
+  ChevronRight,
+  X,
+  List,
+  Map as MapIcon,
+  Crosshair,
+  ShieldCheck,
+  Star,
+  CheckCircle2,
 } from 'lucide-react';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { toilets, campaigns, complaints } = useSanitrack();
-  const [quickSearch, setQuickSearch] = useState('');
+  const {
+    toilets,
+    userLocation,
+    setUserLocation,
+    isFavorite,
+    toggleFavorite,
+  } = useSanitrack();
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    navigate(`/find?q=${encodeURIComponent(quickSearch)}`);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedToilet, setSelectedToilet] = useState<Toilet | null>(null);
+  const [viewMode, setViewMode] = useState<'map' | 'list'>('map');
+
+  // Quick Filters
+  const [filterOpenOnly, setFilterOpenOnly] = useState(false);
+  const [filterWomenOnly, setFilterWomenOnly] = useState(false);
+  const [filterPadsOnly, setFilterPadsOnly] = useState(false);
+  const [filterAccessibleOnly, setFilterAccessibleOnly] = useState(false);
+  const [filterFreeOnly, setFilterFreeOnly] = useState(false);
+  const [filterWaterOnly, setFilterWaterOnly] = useState(false);
+
+  // Filtered Toilets
+  const filteredToilets = useMemo(() => {
+    return toilets
+      .filter((toilet) => {
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          const matchName = toilet.name.toLowerCase().includes(q);
+          const matchLoc = toilet.locality.toLowerCase().includes(q);
+          const matchAddr = toilet.address.toLowerCase().includes(q);
+          const matchCode = toilet.facilityCode.toLowerCase().includes(q);
+          if (!matchName && !matchLoc && !matchAddr && !matchCode) return false;
+        }
+
+        if (filterOpenOnly && toilet.currentStatus !== 'open') return false;
+        if (
+          filterWomenOnly &&
+          !toilet.sections.some((s) => s.sectionType === 'women')
+        )
+          return false;
+        if (
+          filterPadsOnly &&
+          !toilet.sanitaryFacilities?.some(
+            (sf) => sf.facilityType === 'pad_dispenser' && sf.availability
+          )
+        )
+          return false;
+        if (filterAccessibleOnly && !toilet.facilities.wheelchairRamp)
+          return false;
+        if (filterFreeOnly && toilet.entryFee > 0) return false;
+        if (filterWaterOnly && !toilet.facilities.hasRunningWater) return false;
+
+        return true;
+      })
+      .map((t) => ({
+        ...t,
+        distanceKm: calculateDistanceKm(
+          userLocation.lat,
+          userLocation.lng,
+          t.latitude,
+          t.longitude
+        ),
+      }))
+      .sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
+  }, [
+    toilets,
+    searchQuery,
+    filterOpenOnly,
+    filterWomenOnly,
+    filterPadsOnly,
+    filterAccessibleOnly,
+    filterFreeOnly,
+    filterWaterOnly,
+    userLocation,
+  ]);
+
+  const handleLocateMe = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setUserLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+          alert('GPS location updated to your current position!');
+        },
+        () => {
+          alert('Unable to retrieve location. Defaulting to Pune City Center.');
+        }
+      );
+    }
   };
 
-  // Top featured toilets
-  const featuredToilets = toilets.slice(0, 3);
-  const activeCampaign = campaigns[0];
   const openCount = toilets.filter((t) => t.currentStatus === 'open').length;
-  const padAvailableCount = toilets.filter((t) =>
-    t.sanitaryFacilities?.some(
-      (sf) => sf.facilityType === 'pad_dispenser' && sf.currentStock === 'available'
-    )
-  ).length;
 
   return (
-    <div className="space-y-16 pb-16">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50/70 via-white to-slate-50 pt-12 pb-16 px-4 sm:px-6 lg:px-8 border-b border-slate-200">
-        <div className="max-w-5xl mx-auto text-center space-y-6">
-          {/* Civic Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold border border-emerald-200 shadow-xs">
-            <Award className="w-3.5 h-3.5 text-emerald-700" />
-            <span>Naya Bharat 2047 · Problem Statement 3.2 Solution</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            Is there a <span className="text-emerald-600 underline decoration-emerald-300">usable</span> toilet nearby?
-          </h1>
-
-          <p className="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 font-normal leading-relaxed">
-            SaniTrack connects citizens, sanitation operators, municipal ward officers, and community funding partners into a real-time accountability network for clean, safe, and accessible sanitation.
-          </p>
-
-          {/* Quick Search Box */}
-          <div className="max-w-2xl mx-auto">
-            <form
-              onSubmit={handleSearchSubmit}
-              className="flex items-center gap-2 p-2 bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200"
-            >
-              <div className="relative flex-1">
-                <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={quickSearch}
-                  onChange={(e) => setQuickSearch(e.target.value)}
-                  placeholder="Enter Pune area (e.g. FC Road, Swargate, Station, Deccan)..."
-                  className="w-full pl-12 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none"
-                />
-              </div>
+    <div className="relative min-h-[calc(100vh-120px)] flex flex-col bg-slate-100 pb-20">
+      {/* Top Floating Service Bar */}
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-3 sm:px-6 py-2.5 space-y-2 shadow-xs">
+        {/* Search & Location Bar */}
+        <div className="max-w-4xl mx-auto flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search area (e.g. FC Road, Swargate, Station)..."
+              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+            />
+            {searchQuery && (
               <button
-                type="submit"
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all shadow-md shadow-emerald-600/30 flex items-center gap-2 shrink-0"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
               >
-                <Compass className="w-4 h-4" />
-                <span>Find Now</span>
+                <X className="w-3.5 h-3.5" />
               </button>
-            </form>
-
-            {/* Quick Action Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 text-xs font-semibold text-slate-600">
-              <span className="text-slate-400 text-[11px]">Quick Filters:</span>
-              <Link
-                to="/find?filter=open"
-                className="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-emerald-800 hover:border-emerald-300 shadow-2xs transition-colors flex items-center gap-1.5"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Open Right Now</span>
-              </Link>
-              <Link
-                to="/hygiene"
-                className="px-3 py-1.5 rounded-lg bg-pink-50 hover:bg-pink-100 border border-pink-200 text-pink-800 shadow-2xs transition-colors flex items-center gap-1.5"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-pink-600" />
-                <span>Sanitary Pads Available</span>
-              </Link>
-              <Link
-                to="/night-mode"
-                className="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-900 shadow-2xs transition-colors flex items-center gap-1.5"
-              >
-                <Moon className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Night Safe Recommendations</span>
-              </Link>
-              <Link
-                to="/find?filter=accessible"
-                className="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-900 shadow-2xs transition-colors flex items-center gap-1.5"
-              >
-                <Accessibility className="w-3.5 h-3.5 text-blue-600" />
-                <span>Wheelchair Ramp & Rails</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Live Pilot Stats Bar */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl grid grid-cols-2 md:grid-cols-4 gap-6 text-center divide-y md:divide-y-0 md:divide-x divide-slate-800">
-          <div className="space-y-1">
-            <div className="text-3xl sm:text-4xl font-black text-emerald-400">
-              {openCount} / {toilets.length}
-            </div>
-            <div className="text-xs text-slate-300 font-semibold uppercase tracking-wider">
-              Verified Open Toilets
-            </div>
-            <div className="text-[11px] text-slate-500">Live Pune Pilot Audited</div>
+            )}
           </div>
 
-          <div className="space-y-1 pt-4 md:pt-0">
-            <div className="text-3xl sm:text-4xl font-black text-pink-400">
-              {padAvailableCount} Units
-            </div>
-            <div className="text-xs text-slate-300 font-semibold uppercase tracking-wider">
-              Stocked Pad Dispensers
-            </div>
-            <div className="text-[11px] text-slate-500">Real-time stock tracking</div>
-          </div>
-
-          <div className="space-y-1 pt-4 md:pt-0">
-            <div className="text-3xl sm:text-4xl font-black text-teal-300">
-              {complaints.filter((c) => c.status === 'resolved').length} Resolved
-            </div>
-            <div className="text-xs text-slate-300 font-semibold uppercase tracking-wider">
-              Citizen Grievances Fixed
-            </div>
-            <div className="text-[11px] text-slate-500">Photo-verified completion</div>
-          </div>
-
-          <div className="space-y-1 pt-4 md:pt-0">
-            <div className="text-3xl sm:text-4xl font-black text-amber-400">
-              ₹{(campaigns.reduce((acc, c) => acc + c.raisedAmount, 0)).toLocaleString()}
-            </div>
-            <div className="text-xs text-slate-300 font-semibold uppercase tracking-wider">
-              Community Funds Raised
-            </div>
-            <div className="text-[11px] text-slate-500">Rotary & Citizen Transparency</div>
-          </div>
-        </div>
-      </section>
-
-      {/* Core 4-Pillar Promise */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-            How SaniTrack Works: The Closed-Loop Civic Engine
-          </h2>
-          <p className="text-sm text-slate-600">
-            Beyond ordinary static map pins. SaniTrack creates verified, timestamped sanitation trust.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Card 1: Find */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-emerald-300 transition-colors space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-lg">
-              1
-            </div>
-            <h3 className="font-bold text-base text-slate-900">Find Usable Toilets</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Locate open facilities on synchronized maps with instant distance, opening hours, gender sections, and wheelchair access data.
-            </p>
-          </div>
-
-          {/* Card 2: Verify */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-indigo-300 transition-colors space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-lg">
-              2
-            </div>
-            <h3 className="font-bold text-base text-slate-900">Verify Real Freshness</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Every status is timestamped with its source: Operator log, Municipal audit, or Citizen verification. No stale or assumed data.
-            </p>
-          </div>
-
-          {/* Card 3: Report */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-rose-300 transition-colors space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-black text-lg">
-              3
-            </div>
-            <h3 className="font-bold text-base text-slate-900">Report & Track Publicly</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Submit issues with photos and track them via public reference codes. Ward officers are notified with strict resolution SLAs.
-            </p>
-          </div>
-
-          {/* Card 4: Improve */}
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:border-amber-300 transition-colors space-y-3">
-            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-black text-lg">
-              4
-            </div>
-            <h3 className="font-bold text-base text-slate-900">Fund & Fix Transparently</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Rotary clubs and community groups sponsor overdue repairs. Every rupee raised is matched with public contractor receipts.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Toilets Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-              Featured Pune Facilities
-            </h2>
-            <p className="text-xs text-slate-500">
-              Highest rated and recently verified facilities in the Pune Pilot zone
-            </p>
-          </div>
-          <Link
-            to="/find"
-            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition-colors"
+          {/* GPS Locate Me Button */}
+          <button
+            onClick={handleLocateMe}
+            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-colors"
+            title="Locate me via GPS"
           >
-            <span>Explore all {toilets.length} pilot toilets on Map</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+            <Crosshair className="w-4 h-4 text-emerald-600" />
+            <span className="hidden sm:inline">Near Me</span>
+          </button>
+
+          {/* Map vs List Toggle Button */}
+          <button
+            onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
+            className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5 shrink-0 transition-all shadow-xs"
+          >
+            {viewMode === 'map' ? (
+              <>
+                <List className="w-4 h-4" />
+                <span className="hidden sm:inline">List View</span>
+              </>
+            ) : (
+              <>
+                <MapIcon className="w-4 h-4" />
+                <span className="hidden sm:inline">Map View</span>
+              </>
+            )}
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featuredToilets.map((toilet) => (
-            <ToiletCard key={toilet.id} toilet={toilet} />
-          ))}
+        {/* Horizontally Scrollable Fast Filter Pills */}
+        <div className="max-w-4xl mx-auto flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs">
+          <button
+            onClick={() => setFilterOpenOnly(!filterOpenOnly)}
+            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+              filterOpenOnly
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            🟢 Open Now ({openCount})
+          </button>
+
+          <button
+            onClick={() => setFilterWomenOnly(!filterWomenOnly)}
+            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+              filterWomenOnly
+                ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            👩 Women’s Section
+          </button>
+
+          <button
+            onClick={() => setFilterPadsOnly(!filterPadsOnly)}
+            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+              filterPadsOnly
+                ? 'bg-pink-600 text-white border-pink-600 shadow-xs'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            ✨ Pads Available
+          </button>
+
+          <button
+            onClick={() => setFilterAccessibleOnly(!filterAccessibleOnly)}
+            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+              filterAccessibleOnly
+                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            ♿ Accessible Ramp
+          </button>
+
+          <button
+            onClick={() => setFilterWaterOnly(!filterWaterOnly)}
+            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+              filterWaterOnly
+                ? 'bg-cyan-600 text-white border-cyan-600 shadow-xs'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            💧 Running Water
+          </button>
+
+          <button
+            onClick={() => setFilterFreeOnly(!filterFreeOnly)}
+            className={`px-3 py-1 rounded-full font-semibold shrink-0 transition-all border ${
+              filterFreeOnly
+                ? 'bg-teal-600 text-white border-teal-600 shadow-xs'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            🆓 Free Entry
+          </button>
+
+          {(filterOpenOnly ||
+            filterWomenOnly ||
+            filterPadsOnly ||
+            filterAccessibleOnly ||
+            filterWaterOnly ||
+            filterFreeOnly) && (
+            <button
+              onClick={() => {
+                setFilterOpenOnly(false);
+                setFilterWomenOnly(false);
+                setFilterPadsOnly(false);
+                setFilterAccessibleOnly(false);
+                setFilterWaterOnly(false);
+                setFilterFreeOnly(false);
+              }}
+              className="text-[11px] font-bold text-rose-600 hover:text-rose-700 px-2 shrink-0"
+            >
+              Reset
+            </button>
+          )}
         </div>
-      </section>
+      </div>
 
-      {/* Featured Community Funding Banner */}
-      {activeCampaign && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-teal-950 text-white rounded-3xl p-6 sm:p-10 border border-emerald-800/40 shadow-2xl relative overflow-hidden">
-            <div className="relative z-10 max-w-3xl space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-400/30">
-                <HeartHandshake className="w-3.5 h-3.5" />
-                <span>Active Community Maintenance Project</span>
+      {/* Main Service Area: Interactive Map vs List View */}
+      {viewMode === 'map' ? (
+        <div className="relative flex-1 w-full h-[calc(100vh-190px)] min-h-[460px]">
+          {/* Direct Interactive Map */}
+          <ToiletMap
+            toilets={filteredToilets}
+            selectedToiletId={selectedToilet?.id}
+            onSelectToilet={(t) => setSelectedToilet(t)}
+            userLocation={userLocation}
+            height="100%"
+          />
+
+          {/* Quick Counter Overlay Pill */}
+          <div className="absolute top-3 left-3 z-20 bg-slate-900/85 backdrop-blur-md text-white text-[11px] font-semibold px-3 py-1.5 rounded-full shadow-md flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>
+              {filteredToilets.length} Toilets in Pune Pilot
+            </span>
+          </div>
+
+          {/* Floating Selected Toilet Bottom Sheet Card */}
+          {selectedToilet && (
+            <div className="absolute bottom-4 left-3 right-3 sm:left-auto sm:right-4 sm:w-96 z-30 bg-white rounded-3xl p-4 sm:p-5 shadow-2xl border border-slate-200/90 animate-slide-up space-y-3">
+              {/* Header */}
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-mono text-[10px] font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded">
+                      {selectedToilet.facilityCode}
+                    </span>
+                    <StatusBadge status={selectedToilet.currentStatus} size="sm" />
+                    <span className="text-[10px] font-bold text-slate-600">
+                      {selectedToilet.distanceKm} km away
+                    </span>
+                  </div>
+                  <h3 className="font-black text-sm sm:text-base text-slate-900 mt-1 leading-snug">
+                    {selectedToilet.name}
+                  </h3>
+                  <div className="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                    <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                    <span className="truncate">{selectedToilet.address}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => toggleFavorite(selectedToilet.id)}
+                    className={`p-1.5 rounded-full transition-colors ${
+                      isFavorite(selectedToilet.id)
+                        ? 'text-rose-500 bg-rose-50'
+                        : 'text-slate-400 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Heart
+                      className={`w-4 h-4 ${
+                        isFavorite(selectedToilet.id) ? 'fill-rose-500' : ''
+                      }`}
+                    />
+                  </button>
+                  <button
+                    onClick={() => setSelectedToilet(null)}
+                    className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
-              <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                {activeCampaign.title}
-              </h3>
-
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                {activeCampaign.description}
-              </p>
-
-              {/* Progress Bar */}
-              <div className="space-y-1.5 pt-2">
-                <div className="flex items-center justify-between text-xs font-bold">
-                  <span className="text-emerald-400">
-                    ₹{activeCampaign.raisedAmount.toLocaleString()} Raised
+              {/* Quick Feature Badges */}
+              <div className="flex flex-wrap gap-1.5 text-[10px] font-semibold text-slate-700">
+                <span className="px-2 py-0.5 bg-slate-100 rounded-md">
+                  {selectedToilet.entryFee === 0 ? 'FREE' : `₹${selectedToilet.entryFee}`}
+                </span>
+                <span className="px-2 py-0.5 bg-slate-100 rounded-md">
+                  🕒 {selectedToilet.openingHours.is24x7 ? 'Open 24/7' : `${selectedToilet.openingHours.open}-${selectedToilet.openingHours.close}`}
+                </span>
+                {selectedToilet.sanitaryFacilities?.some(
+                  (sf) => sf.facilityType === 'pad_dispenser' && sf.availability
+                ) && (
+                  <span className="px-2 py-0.5 bg-pink-50 text-pink-700 rounded-md border border-pink-200">
+                    ✨ Pads Available
                   </span>
-                  <span className="text-slate-400">
-                    Goal: ₹{activeCampaign.targetAmount.toLocaleString()}
+                )}
+                {selectedToilet.facilities.wheelchairRamp && (
+                  <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md border border-blue-200">
+                    ♿ Ramp
                   </span>
-                </div>
-                <div className="h-3 w-full bg-slate-800 rounded-full overflow-hidden border border-slate-700">
-                  <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.min(
-                        100,
-                        (activeCampaign.raisedAmount / activeCampaign.targetAmount) * 100
-                      )}%`,
-                    }}
-                  />
-                </div>
+                )}
+                {selectedToilet.facilities.hasRunningWater ? (
+                  <span className="px-2 py-0.5 bg-cyan-50 text-cyan-800 rounded-md">
+                    💧 Water OK
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 bg-rose-50 text-rose-700 rounded-md">
+                    No Water
+                  </span>
+                )}
               </div>
 
-              <div className="pt-2 flex flex-wrap items-center gap-3">
-                <Link
-                  to={`/campaigns/${activeCampaign.id}`}
-                  className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold text-xs rounded-xl transition-all shadow-md flex items-center gap-2"
+              <div className="text-[10px] text-slate-400 italic">
+                {selectedToilet.statusFreshness}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-3 gap-2 pt-1 border-t border-slate-100">
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&destination=${selectedToilet.latitude},${selectedToilet.longitude}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="py-2 px-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1 transition-colors shadow-xs"
                 >
-                  <TrendingUp className="w-4 h-4" />
-                  <span>View Project & Transparency Ledger</span>
+                  <Navigation className="w-3.5 h-3.5" />
+                  <span>Directions</span>
+                </a>
+
+                <Link
+                  to={`/toilets/${selectedToilet.id}`}
+                  className="py-2 px-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1 transition-colors"
+                >
+                  <span>Details</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
+
                 <Link
-                  to="/campaigns"
-                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-colors"
+                  to={`/report?toiletId=${selectedToilet.id}`}
+                  className="py-2 px-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs rounded-xl flex items-center justify-center gap-1 transition-colors"
                 >
-                  All Partner Campaigns &rarr;
+                  <AlertOctagon className="w-3.5 h-3.5" />
+                  <span>Report</span>
                 </Link>
               </div>
             </div>
+          )}
+        </div>
+      ) : (
+        /* List Mode View */
+        <div className="max-w-4xl mx-auto w-full px-4 py-4 space-y-3">
+          <div className="text-xs font-bold text-slate-500 px-1">
+            Found {filteredToilets.length} public facilities in Pune Pilot
           </div>
-        </section>
-      )}
 
-      {/* Call to action */}
-      <section className="max-w-4xl mx-auto px-4 text-center space-y-4">
-        <h3 className="text-2xl font-bold text-slate-900">
-          Encountered a locked or dirty public toilet in Pune?
-        </h3>
-        <p className="text-sm text-slate-600 max-w-xl mx-auto">
-          Help your fellow citizens. Report an issue in 60 seconds with an optional photo. No login strictly required.
-        </p>
-        <Link
-          to="/report"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow-md shadow-rose-600/30 transition-all hover:scale-105"
-        >
-          <AlertOctagon className="w-4 h-4" />
-          <span>Report a Sanitation Grievance</span>
-        </Link>
-      </section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {filteredToilets.map((toilet) => (
+              <div
+                key={toilet.id}
+                onClick={() => {
+                  setSelectedToilet(toilet);
+                  setViewMode('map');
+                }}
+                className="p-4 bg-white rounded-2xl border border-slate-200 shadow-2xs hover:border-emerald-400 hover:shadow-xs transition-all cursor-pointer space-y-2.5"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="font-mono text-[10px] font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded">
+                        {toilet.facilityCode}
+                      </span>
+                      <StatusBadge status={toilet.currentStatus} size="sm" />
+                      <span className="text-[11px] font-bold text-slate-700">
+                        {toilet.distanceKm} km
+                      </span>
+                    </div>
+                    <h4 className="font-bold text-sm text-slate-900 mt-1 line-clamp-1">
+                      {toilet.name}
+                    </h4>
+                    <p className="text-xs text-slate-500 line-clamp-1">{toilet.address}</p>
+                  </div>
+
+                  <span className="text-xs font-black text-slate-800 shrink-0">
+                    {toilet.entryFee === 0 ? 'FREE' : `₹${toilet.entryFee}`}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-1 text-[10px] text-slate-600">
+                  {toilet.sanitaryFacilities?.some(
+                    (sf) => sf.facilityType === 'pad_dispenser' && sf.availability
+                  ) && (
+                    <span className="px-1.5 py-0.2 bg-pink-50 text-pink-700 rounded font-semibold border border-pink-200">
+                      ✨ Pads
+                    </span>
+                  )}
+                  {toilet.facilities.wheelchairRamp && (
+                    <span className="px-1.5 py-0.2 bg-blue-50 text-blue-700 rounded font-semibold border border-blue-200">
+                      ♿ Accessible
+                    </span>
+                  )}
+                  {toilet.facilities.hasRunningWater && (
+                    <span className="px-1.5 py-0.2 bg-cyan-50 text-cyan-800 rounded font-semibold">
+                      💧 Water
+                    </span>
+                  )}
+                  <span className="px-1.5 py-0.2 bg-slate-100 rounded font-semibold">
+                    ★ {toilet.rating}
+                  </span>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${toilet.latitude},${toilet.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="font-bold text-emerald-700 hover:underline flex items-center gap-1"
+                  >
+                    <Navigation className="w-3.5 h-3.5" />
+                    <span>Navigate</span>
+                  </a>
+
+                  <Link
+                    to={`/toilets/${toilet.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="font-bold text-slate-700 hover:text-slate-900 flex items-center gap-0.5"
+                  >
+                    <span>Profile</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
