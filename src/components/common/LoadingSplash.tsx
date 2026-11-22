@@ -68,27 +68,25 @@ export const LoadingSplash: React.FC = () => {
           <div className="absolute w-44 h-44 rounded-full border border-emerald-300/30 animate-pulse"></div>
 
           {/* Central Logo Box */}
-          <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-white p-3 shadow-2xl shadow-emerald-500/15 border border-emerald-100/80 flex items-center justify-center overflow-hidden transition-transform duration-500 hover:scale-105">
+          <div className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-3xl bg-white p-3 shadow-2xl shadow-emerald-500/15 border border-emerald-100/80 flex items-center justify-center overflow-hidden transition-transform duration-500 hover:scale-105">
             <img
-              src="/flashload.jpg"
+              src="/flashload1.png"
               alt="SaniTrack Official Logo"
               className="w-full h-full object-contain drop-shadow-xs"
             />
           </div>
         </div>
 
-        {/* Brand Titles */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-center gap-1.5">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-              SaniTrack
-            </h1>
-            <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
-              Pune
+        {/* Brand Subtitle & Pilot Tag */}
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span className="text-[11px] font-bold text-emerald-800 tracking-wide uppercase">
+              Pune Pilot Sanitation Network
             </span>
           </div>
-          <p className="text-xs font-semibold text-emerald-800">
-            Smart Public Sanitation & Dignity Network
+          <p className="text-xs font-semibold text-slate-600">
+            Smart Public Restrooms & Dignity Infrastructure
           </p>
           <div className="text-[10px] text-slate-400 font-medium">
             Naya Bharat 2047 · Problem Statement 3.2
