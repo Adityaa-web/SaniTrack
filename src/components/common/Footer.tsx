@@ -10,9 +10,11 @@ export const Footer: React.FC = () => {
           {/* Col 1: Mission */}
           <div className="space-y-3 md:col-span-1">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-black text-sm">
-                ST
-              </div>
+              <img
+                src="/flashload.jpg"
+                alt="SaniTrack Official Logo"
+                className="w-8 h-8 rounded-lg object-contain bg-white p-0.5"
+              />
               <span className="font-extrabold text-lg text-white tracking-tight">SaniTrack</span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">

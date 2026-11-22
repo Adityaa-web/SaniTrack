@@ -5,6 +5,7 @@ import { SanitrackProvider } from './context/SanitrackContext';
 import { Navbar } from './components/common/Navbar';
 import { BottomNav } from './components/common/BottomNav';
 import { Footer } from './components/common/Footer';
+import { LoadingSplash } from './components/common/LoadingSplash';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -31,6 +32,7 @@ const AppLayout: React.FC = () => {
         isMapHome ? 'h-screen overflow-hidden' : ''
       }`}
     >
+      <LoadingSplash />
       <Navbar />
       <main className={`flex-1 ${isMapHome ? 'overflow-hidden flex flex-col' : ''}`}>
         <Routes>

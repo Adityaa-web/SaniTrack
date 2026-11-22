@@ -21,9 +21,11 @@ export const Navbar: React.FC = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 h-13 flex items-center justify-between gap-3">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-xs group-hover:scale-105 transition-transform">
-              <span className="font-extrabold text-base tracking-tighter">ST</span>
-            </div>
+            <img
+              src="/flashload.jpg"
+              alt="SaniTrack Official Logo"
+              className="w-8 h-8 rounded-xl object-contain shadow-xs border border-emerald-100 group-hover:scale-105 transition-transform bg-white"
+            />
             <div className="flex items-center gap-1.5">
               <span className="font-black text-lg tracking-tight text-slate-900 group-hover:text-emerald-700 transition-colors">
                 SaniTrack
