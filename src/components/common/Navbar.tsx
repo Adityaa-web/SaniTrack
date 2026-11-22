@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import logoUrl from '../../assets/flashload1.png';
 import {
   Compass,
   Sparkles,
@@ -22,7 +23,7 @@ export const Navbar: React.FC = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <img
-              src="/flashload1.png"
+              src={logoUrl}
               alt="SaniTrack Official Logo"
               className="w-8 h-8 rounded-xl object-contain shadow-xs border border-emerald-100 group-hover:scale-105 transition-transform bg-white"
             />

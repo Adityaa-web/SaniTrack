@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import logoUrl from '../../assets/flashload1.png';
 
 export const LoadingSplash: React.FC = () => {
   const [progress, setProgress] = useState(0);
@@ -70,7 +71,7 @@ export const LoadingSplash: React.FC = () => {
           {/* Central Logo Box */}
           <div className="relative w-36 h-36 sm:w-40 sm:h-40 rounded-3xl bg-white p-3 shadow-2xl shadow-emerald-500/15 border border-emerald-100/80 flex items-center justify-center overflow-hidden transition-transform duration-500 hover:scale-105">
             <img
-              src="/flashload1.png"
+              src={logoUrl}
               alt="SaniTrack Official Logo"
               className="w-full h-full object-contain drop-shadow-xs"
             />

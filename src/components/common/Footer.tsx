@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
+import logoUrl from '../../assets/flashload1.png';
 
 export const Footer: React.FC = () => {
   return (
@@ -10,7 +11,7 @@ export const Footer: React.FC = () => {
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <img
-              src="/flashload1.png"
+              src={logoUrl}
               alt="SaniTrack Official Logo"
               className="w-8 h-8 rounded-lg object-contain bg-white p-0.5"
             />
