@@ -124,17 +124,25 @@ export interface ToiletFacilities {
   wellLitApproach: boolean;
   cctvOutsideApproach: boolean;
   lastInspectedAt: string;
+  // Senior & Maternal Facilities
+  hasAdultDiapers?: boolean;
+  hasSeniorDiapers?: boolean;
+  hasDiaperChangingStation?: boolean;
 }
 
 export interface SanitaryFacility {
   id: string;
   toiletId: string;
-  facilityType: 'pad_dispenser' | 'sanitary_bin' | 'incinerator' | 'changing_area';
+  facilityType: 'pad_dispenser' | 'adult_diaper_dispenser' | 'sanitary_bin' | 'incinerator' | 'changing_area';
+  itemCategory?: 'pads' | 'adult_diapers' | 'both' | 'hygiene';
+  itemDetails?: string;
   availability: boolean;
   paymentType: PaymentType;
   pricePerPad?: number;
+  pricePerDiaper?: number;
   operationalStatus: 'operational' | 'out_of_order' | 'maintenance';
   currentStock: StockStatus;
+  diaperStock?: StockStatus;
   lastRefilledAt: string;
   lastVerifiedAt: string;
   verificationSource: string;
@@ -222,6 +230,13 @@ export interface Complaint {
   resolvedAt?: string;
   resolutionNotes?: string;
   resolutionPhotoPath?: string;
+  // Civic AI Grievance Dispatch & Governor Department Link
+  aiDispatched?: boolean;
+  aiDispatchSummary?: string;
+  aiAssignedDepartment?: string;
+  officialActionToken?: string;
+  tempDispatchStatus?: 'active' | 'resolved' | 'purged';
+  purgedAt?: string;
 }
 
 export interface CleaningLog {

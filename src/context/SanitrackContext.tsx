@@ -10,6 +10,7 @@ import {
   StockStatus,
   ComplaintStatus,
   PriorityLevel,
+  UserRole,
 } from '../types';
 import {
   MOCK_TOILETS,
@@ -47,6 +48,11 @@ interface SanitrackContextType {
     stockStatus: StockStatus,
     pricePerPad?: number
   ) => void;
+  updateDiaperStock: (
+    toiletId: string,
+    stockStatus: StockStatus,
+    pricePerDiaper?: number
+  ) => void;
   // Complaint actions
   submitComplaint: (data: {
     toiletId: string;
@@ -57,7 +63,13 @@ interface SanitrackContextType {
     reporterEmail?: string;
     isAnonymous?: boolean;
     photoDataUrl?: string;
-  }) => string; // returns referenceCode
+  }) => { referenceCode: string; officialActionToken: string };
+  resolveComplaintByOfficial: (
+    token: string,
+    notes: string,
+    resolutionPhoto?: string
+  ) => boolean;
+  getComplaintByOfficialToken: (token: string) => Complaint | undefined;
   updateComplaintStatus: (
     complaintId: string,
     newStatus: ComplaintStatus,
@@ -304,7 +316,46 @@ export const SanitrackProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
 
-  // Submit citizen complaint
+  // Update diaper stock for seniors
+  const updateDiaperStock = (
+    toiletId: string,
+    stockStatus: StockStatus,
+    pricePerDiaper?: number
+  ) => {
+    setToilets((prev) =>
+      prev.map((t) => {
+        if (t.id !== toiletId) return t;
+        const updatedSanitary = (t.sanitaryFacilities || []).map((sf) => {
+          if (
+            sf.facilityType === 'adult_diaper_dispenser' ||
+            sf.itemCategory === 'adult_diapers'
+          ) {
+            return {
+              ...sf,
+              currentStock: stockStatus,
+              diaperStock: stockStatus,
+              pricePerDiaper:
+                pricePerDiaper !== undefined ? pricePerDiaper : sf.pricePerDiaper,
+              lastRefilledAt:
+                stockStatus === 'available'
+                  ? new Date().toISOString()
+                  : sf.lastRefilledAt,
+              lastVerifiedAt: new Date().toISOString(),
+              verificationSource: `Operator ${currentUser.fullName}`,
+            };
+          }
+          return sf;
+        });
+        return {
+          ...t,
+          sanitaryFacilities: updatedSanitary,
+          statusFreshness: `Senior diaper stock updated to ${stockStatus} · Just now`,
+        };
+      })
+    );
+  };
+
+  // Submit citizen complaint with AI dispatch to Governor's Department
   const submitComplaint = (data: {
     toiletId: string;
     toiletName: string;
@@ -314,10 +365,13 @@ export const SanitrackProvider: React.FC<{ children: React.ReactNode }> = ({
     reporterEmail?: string;
     isAnonymous?: boolean;
     photoDataUrl?: string;
-  }): string => {
+  }): { referenceCode: string; officialActionToken: string } => {
     const refCode = generateComplaintRef();
     const newId = `comp-${Date.now()}`;
     const now = new Date().toISOString();
+    const officialActionToken = `GOV-ACT-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    const aiAssignedDepartment = "Governor's Public Sanitation Taskforce & PMC Central Ward Cell";
+    const aiDispatchSummary = `Civic AI triaged grievance for "${data.toiletName}". Evaluated priority ${data.priority.toUpperCase()} & sanitation impact. Dispatched to Governor's Taskforce with auto-purging temporary action token ${officialActionToken}.`;
 
     const newComplaint: Complaint = {
       id: newId,
@@ -334,10 +388,17 @@ export const SanitrackProvider: React.FC<{ children: React.ReactNode }> = ({
         : 'Citizen Contributor',
       isAnonymous: data.isAnonymous ?? false,
       isPublicSummary: true,
-      eligibleForCampaign: data.category.toLowerCase().includes('broken') || data.category.toLowerCase().includes('water'),
+      eligibleForCampaign:
+        data.category.toLowerCase().includes('broken') ||
+        data.category.toLowerCase().includes('water'),
       estimatedCost: 0,
       createdAt: now,
       updatedAt: now,
+      aiDispatched: true,
+      aiDispatchSummary,
+      aiAssignedDepartment,
+      officialActionToken,
+      tempDispatchStatus: 'active',
       attachments: data.photoDataUrl
         ? [
             {
@@ -354,16 +415,72 @@ export const SanitrackProvider: React.FC<{ children: React.ReactNode }> = ({
           id: `ev-${Date.now()}`,
           complaintId: newId,
           newStatus: 'submitted',
-          actorName: data.isAnonymous ? 'Anonymous Citizen' : currentUser.fullName,
-          actorRole: currentUser.role,
-          notes: 'Grievance submitted via SaniTrack Citizen Portal. Automatic triage queued.',
+          actorName: data.isAnonymous ? 'Anonymous Citizen' : (data.reporterEmail || 'Citizen'),
+          actorRole: 'citizen',
+          notes: "Grievance submitted. Civic AI generated priority brief and dispatched to Governor's Taskforce.",
           createdAt: now,
         },
       ],
     };
 
     setComplaints((prev) => [newComplaint, ...prev]);
-    return refCode;
+    return { referenceCode: refCode, officialActionToken };
+  };
+
+  // Official resolution from temporary link (purges temporary dispatch link)
+  const resolveComplaintByOfficial = (
+    token: string,
+    notes: string,
+    resolutionPhoto?: string
+  ): boolean => {
+    const now = new Date().toISOString();
+    let found = false;
+
+    setComplaints((prev) =>
+      prev.map((c) => {
+        if (c.officialActionToken === token) {
+          found = true;
+          const newEvents = [
+            ...c.events,
+            {
+              id: `ev-${Date.now()}`,
+              complaintId: c.id,
+              previousStatus: c.status,
+              newStatus: 'resolved' as ComplaintStatus,
+              actorName: "Governor's Sanitation Taskforce / PMC Officer",
+              actorRole: 'municipal_officer' as UserRole,
+              notes:
+                notes ||
+                'Remediation verified on site. Temporary emergency ticket purged from active queue.',
+              createdAt: now,
+            },
+          ];
+
+          return {
+            ...c,
+            status: 'resolved' as ComplaintStatus,
+            tempDispatchStatus: 'purged' as const,
+            resolvedAt: now,
+            purgedAt: now,
+            resolutionNotes:
+              notes ||
+              'Field squad repaired issue and sanitized facility. Verified by Governor Taskforce.',
+            resolutionPhotoPath:
+              resolutionPhoto ||
+              'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=600&auto=format&fit=crop&q=80',
+            events: newEvents,
+            updatedAt: now,
+          };
+        }
+        return c;
+      })
+    );
+
+    return found;
+  };
+
+  const getComplaintByOfficialToken = (token: string): Complaint | undefined => {
+    return complaints.find((c) => c.officialActionToken === token);
   };
 
   // Update complaint status & add audit event
@@ -711,7 +828,10 @@ export const SanitrackProvider: React.FC<{ children: React.ReactNode }> = ({
         updateToiletStatus,
         updateToiletFacilities,
         updatePadStock,
+        updateDiaperStock,
         submitComplaint,
+        resolveComplaintByOfficial,
+        getComplaintByOfficialToken,
         updateComplaintStatus,
         assignComplaint,
         makeDemoPledge,

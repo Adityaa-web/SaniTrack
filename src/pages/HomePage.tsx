@@ -42,7 +42,8 @@ export const HomePage: React.FC = () => {
   // Quick Filters
   const [filterOpenOnly, setFilterOpenOnly] = useState(false);
   const [filterWomenOnly, setFilterWomenOnly] = useState(false);
-  const [filterPadsOnly, setFilterPadsOnly] = useState(false);
+  const [filterSanitaryOnly, setFilterSanitaryOnly] = useState(false);
+  const [filterDiapersOnly, setFilterDiapersOnly] = useState(false);
   const [filterAccessibleOnly, setFilterAccessibleOnly] = useState(false);
   const [filterFreeOnly, setFilterFreeOnly] = useState(false);
   const [filterWaterOnly, setFilterWaterOnly] = useState(false);
@@ -67,10 +68,26 @@ export const HomePage: React.FC = () => {
         )
           return false;
         if (
-          filterPadsOnly &&
+          filterSanitaryOnly &&
           !toilet.sanitaryFacilities?.some(
-            (sf) => sf.facilityType === 'pad_dispenser' && sf.availability
+            (sf) =>
+              (sf.facilityType === 'pad_dispenser' ||
+                sf.facilityType === 'adult_diaper_dispenser' ||
+                sf.itemCategory === 'adult_diapers') &&
+              sf.availability
           )
+        )
+          return false;
+        if (
+          filterDiapersOnly &&
+          !toilet.sanitaryFacilities?.some(
+            (sf) =>
+              (sf.facilityType === 'adult_diaper_dispenser' ||
+                sf.itemCategory === 'adult_diapers') &&
+              sf.availability
+          ) &&
+          !toilet.facilities.hasAdultDiapers &&
+          !toilet.facilities.hasSeniorDiapers
         )
           return false;
         if (filterAccessibleOnly && !toilet.facilities.wheelchairRamp)
@@ -95,7 +112,8 @@ export const HomePage: React.FC = () => {
     searchQuery,
     filterOpenOnly,
     filterWomenOnly,
-    filterPadsOnly,
+    filterSanitaryOnly,
+    filterDiapersOnly,
     filterAccessibleOnly,
     filterFreeOnly,
     filterWaterOnly,
@@ -200,14 +218,25 @@ export const HomePage: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setFilterPadsOnly(!filterPadsOnly)}
+            onClick={() => setFilterSanitaryOnly(!filterSanitaryOnly)}
             className={`px-2.5 py-0.5 rounded-full font-semibold shrink-0 transition-all border text-[11px] ${
-              filterPadsOnly
+              filterSanitaryOnly
                 ? 'bg-pink-600 text-white border-pink-600 shadow-xs'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
             }`}
           >
-            ✨ Pads
+            🧴 Sanitary
+          </button>
+
+          <button
+            onClick={() => setFilterDiapersOnly(!filterDiapersOnly)}
+            className={`px-2.5 py-0.5 rounded-full font-semibold shrink-0 transition-all border text-[11px] ${
+              filterDiapersOnly
+                ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            👴 Senior Diapers
           </button>
 
           <button
@@ -245,7 +274,8 @@ export const HomePage: React.FC = () => {
 
           {(filterOpenOnly ||
             filterWomenOnly ||
-            filterPadsOnly ||
+            filterSanitaryOnly ||
+            filterDiapersOnly ||
             filterAccessibleOnly ||
             filterWaterOnly ||
             filterFreeOnly) && (
@@ -253,7 +283,8 @@ export const HomePage: React.FC = () => {
               onClick={() => {
                 setFilterOpenOnly(false);
                 setFilterWomenOnly(false);
-                setFilterPadsOnly(false);
+                setFilterSanitaryOnly(false);
+                setFilterDiapersOnly(false);
                 setFilterAccessibleOnly(false);
                 setFilterWaterOnly(false);
                 setFilterFreeOnly(false);
@@ -345,6 +376,18 @@ export const HomePage: React.FC = () => {
                 ) && (
                   <span className="px-1.5 py-0.5 bg-pink-50 text-pink-700 rounded border border-pink-200">
                     ✨ Pads
+                  </span>
+                )}
+                {(selectedToilet.sanitaryFacilities?.some(
+                  (sf) =>
+                    (sf.facilityType === 'adult_diaper_dispenser' ||
+                      sf.itemCategory === 'adult_diapers') &&
+                    sf.availability
+                ) ||
+                  selectedToilet.facilities.hasAdultDiapers ||
+                  selectedToilet.facilities.hasSeniorDiapers) && (
+                  <span className="px-1.5 py-0.5 bg-purple-50 text-purple-700 rounded border border-purple-200">
+                    👴 Senior Diapers
                   </span>
                 )}
                 {selectedToilet.facilities.wheelchairRamp && (

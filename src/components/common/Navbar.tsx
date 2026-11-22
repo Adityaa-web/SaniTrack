@@ -64,7 +64,7 @@ export const Navbar: React.FC = () => {
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              Pads & Hygiene
+              Sanitary & Diapers
             </Link>
             <Link
               to="/night-mode"

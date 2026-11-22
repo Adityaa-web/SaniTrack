@@ -19,6 +19,7 @@ import { CampaignDetailPage } from './pages/CampaignDetailPage';
 import { AboutPage } from './pages/AboutPage';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { AccessibilityPage } from './pages/AccessibilityPage';
+import { OfficialActionPage } from './pages/OfficialActionPage';
 
 const AppLayout: React.FC = () => {
   const location = useLocation();
@@ -45,6 +46,7 @@ const AppLayout: React.FC = () => {
           <Route path="/track/:reference" element={<TrackComplaintPage />} />
           <Route path="/campaigns" element={<CampaignsPage />} />
           <Route path="/campaigns/:id" element={<CampaignDetailPage />} />
+          <Route path="/official-action/:token" element={<OfficialActionPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/accessibility" element={<AccessibilityPage />} />

@@ -31,7 +31,7 @@ export const BottomNav: React.FC = () => {
     },
     {
       to: '/hygiene',
-      label: 'Pads',
+      label: 'Sanitary',
       icon: Sparkles,
     },
     {

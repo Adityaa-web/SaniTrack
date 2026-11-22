@@ -203,8 +203,13 @@ export const PublicReportsPage: React.FC = () => {
                           : 'bg-amber-100 text-amber-800'
                       }`}
                     >
-                      {c.status.replace('_', ' ')}
+                      {c.status === 'resolved' ? '✓ Resolved & Done' : c.status.replace('_', ' ')}
                     </span>
+                    {c.aiDispatched && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
+                        🤖 AI Dispatched
+                      </span>
+                    )}
                     <span className="text-[10px] text-slate-400">
                       {formatTimeAgo(c.createdAt)}
                     </span>
@@ -229,6 +234,45 @@ export const PublicReportsPage: React.FC = () => {
               <p className="text-xs text-slate-600 line-clamp-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                 "{c.description}"
               </p>
+
+              {/* Resolved notes & purged indicator */}
+              {c.status === 'resolved' && (
+                <div className="p-2.5 bg-emerald-50/70 rounded-xl border border-emerald-100 text-xs text-emerald-900 space-y-1">
+                  <div className="flex items-center justify-between font-bold text-[11px]">
+                    <span className="flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Resolution Verified Done</span>
+                    </span>
+                    <span className="text-[10px] text-emerald-700 font-normal">
+                      Temporary Link Auto-Purged
+                    </span>
+                  </div>
+                  {c.resolutionNotes && (
+                    <p className="text-[11px] text-emerald-800 leading-snug">
+                      "{c.resolutionNotes}"
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* If active with official token, show link to simulate governor action */}
+              {c.status !== 'resolved' && c.officialActionToken && (
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/official-action/${c.officialActionToken}`);
+                  }}
+                  className="p-2 bg-indigo-50/70 hover:bg-indigo-100/70 rounded-xl border border-indigo-100 text-[11px] text-indigo-900 flex items-center justify-between transition-colors"
+                >
+                  <span className="flex items-center gap-1 font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse"></span>
+                    <span>Governor Action Portal (Active):</span>
+                  </span>
+                  <span className="font-bold text-indigo-700 hover:underline flex items-center gap-0.5">
+                    <span>Inspect / Resolve ↗</span>
+                  </span>
+                </div>
+              )}
 
               {/* Resolution or Assignment Footer */}
               <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">

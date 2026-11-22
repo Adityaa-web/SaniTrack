@@ -19,11 +19,11 @@ const CATEGORIES = [
   'Broken flush/tap/pipe',
   'Broken door lock/latch',
   'Locked or unexpectedly closed',
-  'Sanitary pad dispenser empty or broken',
+  'Sanitary pad or adult diaper dispenser empty / damaged',
+  'Senior accessibility / grab bar broken',
   'Missing sanitary waste bin/disposal',
   'No electricity or dark approach',
   'Blocked drainage / water pooling',
-  'Accessibility ramp/rail broken',
   'Other maintenance issue',
 ];
 
@@ -41,6 +41,7 @@ export const ReportComplaintPage: React.FC = () => {
   const [priority, setPriority] = useState<PriorityLevel>('medium');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [submittedRef, setSubmittedRef] = useState<string | null>(null);
+  const [officialToken, setOfficialToken] = useState<string | null>(null);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,7 +61,7 @@ export const ReportComplaintPage: React.FC = () => {
     const toilet = toilets.find((t) => t.id === selectedToiletId);
     const toiletName = toilet ? toilet.name : 'Pune Public Facility';
 
-    const ref = submitComplaint({
+    const result = submitComplaint({
       toiletId: selectedToiletId || toilets[0]?.id || 'toilet-fc-road-she',
       toiletName,
       category,
@@ -71,7 +72,8 @@ export const ReportComplaintPage: React.FC = () => {
       photoDataUrl: photoPreview || undefined,
     });
 
-    setSubmittedRef(ref);
+    setSubmittedRef(result.referenceCode);
+    setOfficialToken(result.officialActionToken);
   };
 
   return (
@@ -114,6 +116,34 @@ export const ReportComplaintPage: React.FC = () => {
               Updates will be sent to: <strong>{reporterEmail}</strong>
             </div>
           </div>
+
+          {/* Civic AI Direct Dispatch to Governor's Desk */}
+          {officialToken && (
+            <div className="p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200 text-left space-y-2.5 max-w-md mx-auto">
+              <div className="flex items-center gap-2 text-indigo-950 font-bold text-xs">
+                <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
+                <span>🤖 Civic AI Direct Dispatch to Governor's Department</span>
+              </div>
+              <p className="text-[11px] text-indigo-800 leading-relaxed">
+                SaniTrack AI triaged this grievance, evaluated hazard priority, and dispatched an executive brief directly to the <strong>Governor's Municipal Public Sanitation Division</strong>.
+              </p>
+              <div className="p-2.5 bg-white rounded-xl border border-indigo-100 flex items-center justify-between gap-2 shadow-xs">
+                <div className="text-[10px] text-slate-600 truncate">
+                  <span className="font-bold text-slate-800">Temp Dispatch Token:</span> {officialToken}
+                </div>
+                <Link
+                  to={`/official-action/${officialToken}`}
+                  target="_blank"
+                  className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] rounded-lg shadow-xs flex items-center gap-1 shrink-0 transition-colors"
+                >
+                  <span>Open Governor Action Link ↗</span>
+                </Link>
+              </div>
+              <div className="text-[9px] text-indigo-600 italic">
+                * Note: This temporary link remains active on our site until the official resolves it. Once resolved, it will be automatically deleted from active dispatch and visible as DONE on the public site.
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-2">
             <Link
