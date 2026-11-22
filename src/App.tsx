@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { SanitrackProvider } from './context/SanitrackContext';
 import { Navbar } from './components/common/Navbar';
@@ -71,11 +71,11 @@ export const App: React.FC = () => {
   return (
     <AuthProvider>
       <SanitrackProvider>
-        <BrowserRouter>
+        <HashRouter>
           <div className="min-h-screen bg-slate-950 flex justify-center text-slate-900 selection:bg-emerald-500 selection:text-white">
             <AppLayout />
           </div>
-        </BrowserRouter>
+        </HashRouter>
       </SanitrackProvider>
     </AuthProvider>
   );
