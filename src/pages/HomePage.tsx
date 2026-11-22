@@ -140,7 +140,7 @@ export const HomePage: React.FC = () => {
   const openCount = toilets.filter((t) => t.currentStatus === 'open').length;
 
   return (
-    <div className="relative flex-1 flex flex-col w-full h-full overflow-hidden bg-slate-100 pb-14 md:pb-0">
+    <div className="relative flex-1 flex flex-col w-full h-full overflow-hidden bg-slate-100 pb-14">
       {/* Top Floating Service Bar */}
       <div className="bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-2.5 sm:px-6 py-1.5 space-y-1 shadow-xs z-30 shrink-0">
         {/* Search & Location Bar */}
@@ -317,7 +317,7 @@ export const HomePage: React.FC = () => {
 
           {/* Floating Selected Toilet Bottom Sheet Card */}
           {selectedToilet && (
-            <div className="absolute bottom-16 left-2 right-2 sm:left-auto sm:right-3 sm:bottom-4 sm:w-92 z-30 bg-white rounded-3xl p-3.5 sm:p-4 shadow-2xl border border-slate-200 animate-slide-up space-y-2.5">
+            <div className="absolute bottom-16 left-2 right-2 z-30 bg-white rounded-3xl p-3.5 shadow-2xl border border-slate-200 animate-slide-up space-y-2.5">
               {/* Header */}
               <div className="flex items-start justify-between gap-2">
                 <div>

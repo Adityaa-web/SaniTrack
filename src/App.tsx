@@ -28,8 +28,8 @@ const AppLayout: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-emerald-500 selection:text-white ${
-        isMapHome ? 'h-screen overflow-hidden' : ''
+      className={`w-full max-w-md min-h-screen bg-slate-50 text-slate-900 selection:bg-emerald-500 selection:text-white relative flex flex-col shadow-2xl sm:border-x sm:border-slate-300/80 ${
+        isMapHome ? 'h-screen overflow-hidden' : 'pb-16'
       }`}
     >
       <LoadingSplash />
@@ -72,7 +72,9 @@ export const App: React.FC = () => {
     <AuthProvider>
       <SanitrackProvider>
         <BrowserRouter>
-          <AppLayout />
+          <div className="min-h-screen bg-slate-950 flex justify-center text-slate-900 selection:bg-emerald-500 selection:text-white">
+            <AppLayout />
+          </div>
         </BrowserRouter>
       </SanitrackProvider>
     </AuthProvider>

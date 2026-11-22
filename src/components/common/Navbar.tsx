@@ -17,8 +17,8 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 h-13 flex items-center justify-between gap-3">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200">
+        <div className="w-full px-3 h-13 flex items-center justify-between gap-2">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <img
@@ -35,60 +35,6 @@ export const Navbar: React.FC = () => {
               </span>
             </div>
           </Link>
-
-          {/* Desktop Nav Items */}
-          <nav className="hidden md:flex items-center gap-1 text-xs font-semibold">
-            <Link
-              to="/"
-              className={`px-3 py-1.5 rounded-xl transition-all ${
-                location.pathname === '/' || location.pathname === '/find'
-                  ? 'bg-emerald-50 text-emerald-800 font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              Toilets Map
-            </Link>
-            <Link
-              to="/reports"
-              className={`px-3 py-1.5 rounded-xl transition-all ${
-                location.pathname === '/reports'
-                  ? 'bg-emerald-50 text-emerald-800 font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              Public Reports
-            </Link>
-            <Link
-              to="/hygiene"
-              className={`px-3 py-1.5 rounded-xl transition-all ${
-                location.pathname === '/hygiene'
-                  ? 'bg-emerald-50 text-emerald-800 font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              Sanitary & Diapers
-            </Link>
-            <Link
-              to="/night-mode"
-              className={`px-3 py-1.5 rounded-xl transition-all ${
-                location.pathname === '/night-mode'
-                  ? 'bg-emerald-50 text-emerald-800 font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              Night Safe
-            </Link>
-            <Link
-              to="/campaigns"
-              className={`px-3 py-1.5 rounded-xl transition-all ${
-                location.pathname === '/campaigns'
-                  ? 'bg-emerald-50 text-emerald-800 font-bold'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-              }`}
-            >
-              Community Fund
-            </Link>
-          </nav>
 
           {/* Right Header: SOS Button */}
           <div className="flex items-center gap-2">

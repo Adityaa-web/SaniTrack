@@ -49,7 +49,7 @@ export const LoadingSplash: React.FC = () => {
 
   return (
     <div
-      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-b from-white via-slate-50 to-emerald-50/30 transition-all duration-700 ease-out select-none ${
+      className={`fixed inset-0 sm:left-1/2 sm:-translate-x-1/2 sm:max-w-md w-full z-[100] flex flex-col items-center justify-center bg-gradient-to-b from-white via-slate-50 to-emerald-50/30 transition-all duration-700 ease-out select-none ${
         isFadingOut
           ? 'opacity-0 scale-105 pointer-events-none'
           : 'opacity-100 scale-100'
